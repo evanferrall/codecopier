@@ -1,0 +1,17 @@
+{
+  "": {
+    "swift-dependencies": "/Users/test/CodeCopy/.build/index-build/arm64-apple-macosx/debug/CodeCopierCLI.build/master.swiftdeps"
+  },
+  "/Users/test/CodeCopy/CodeCopier/Sources/CodeCopierCLI/CommandsAndHelpers.swift": {
+    "dependencies": "/Users/test/CodeCopy/.build/index-build/arm64-apple-macosx/debug/CodeCopierCLI.build/CommandsAndHelpers.d",
+    "object": "/Users/test/CodeCopy/.build/index-build/arm64-apple-macosx/debug/CodeCopierCLI.build/CommandsAndHelpers.swift.o",
+    "swiftmodule": "/Users/test/CodeCopy/.build/index-build/arm64-apple-macosx/debug/CodeCopierCLI.build/CommandsAndHelpers~partial.swiftmodule",
+    "swift-dependencies": "/Users/test/CodeCopy/.build/index-build/arm64-apple-macosx/debug/CodeCopierCLI.build/CommandsAndHelpers.swiftdeps"
+  },
+  "/Users/test/CodeCopy/CodeCopier/Sources/CodeCopierCLI/Main.swift": {
+    "dependencies": "/Users/test/CodeCopy/.build/index-build/arm64-apple-macosx/debug/CodeCopierCLI.build/Main.d",
+    "object": "/Users/test/CodeCopy/.build/index-build/arm64-apple-macosx/debug/CodeCopierCLI.build/Main.swift.o",
+    "swiftmodule": "/Users/test/CodeCopy/.build/index-build/arm64-apple-macosx/debug/CodeCopierCLI.build/Main~partial.swiftmodule",
+    "swift-dependencies": "/Users/test/CodeCopy/.build/index-build/arm64-apple-macosx/debug/CodeCopierCLI.build/Main.swiftdeps"
+  }
+}

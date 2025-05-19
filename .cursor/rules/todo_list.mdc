@@ -1,0 +1,130 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+### Project Todo List: CodeCopier Swift Rebuild
+
+**Phase 0: Guiding Principles (To be adhered to throughout)**
+*   [ ] Pure-SPM monorepo
+*   [ ] Packages over hand-roll
+*   [ ] Async-first
+*   [ ] CLI-first
+*   [ ] UI = thin shell
+*   [ ] Translucent / ornament glass UI
+
+**Phase 1: Repository Layout & Initial Setup (Corresponds to Week 1) - COMPLETE**
+*   [x] Create `CodeCopier/` root directory.
+*   [x] Create `CodeCopier/Package.swift`.
+    *   [x] Populate `Package.swift` with initial content (swift-tools-version, name, platforms, basic products, dependencies, initial targets).
+*   [x] Create directory structure:
+    *   [x] `CodeCopier/Sources/`
+    *   [x] `CodeCopier/Sources/CodeCopierCore/`
+    *   [x] `CodeCopier/Sources/CodeCopierCLI/`
+    *   [x] `CodeCopier/Sources/CodeCopierUI/`
+    *   [x] `CodeCopier/Sources/Plugins/`
+    *   [x] `CodeCopier/Sources/Plugins/ReleaseDmgPlugin/`
+    *   [x] `CodeCopier/Tests/`
+    *   [x] `CodeCopier/Tests/CoreTests/`
+    *   [x] `CodeCopier/Tests/CLITests/`
+*   [x] **(Week 1 Deliverable)** Boot repo (Git init, .gitignore etc.)
+
+**Phase 2: Core Architecture (`CodeCopierCore`)**
+*   **`FileDiscoverer` (Part of Week 1)**
+    *   [ ] Implement asynchronous file system walking.
+    *   [ ] Return `[FileInfo]`.
+    *   [ ] Use `AsyncThrowingStream`.
+    *   [ ] Implement back-pressure.
+    *   [ ] Use `.withTaskGroup` for parallel SHA-1 & line-count.
+    *   [ ] **(Week 1 Deliverable)** Baseline `FileDiscoverer` implemented.
+*   **`FilterPipeline` (Part of Week 1 for sync tests)**
+    *   [ ] Express rules (extensions, ignored dirs, libs, size cap, binary sniff) as `FilePredicate` closures.
+    *   [ ] Implement `filter(using:)` to combine predicates.
+    *   [ ] **(Week 1 Deliverable)** Sync filter tests for `FileDiscoverer`.
+*   **`SelectionEngine` (Week 2 Deliverable)**
+    *   [ ] Represent selection state (e.g., using `BitSet` from `swift-collections` keyed by file index).
+    *   [ ] Implement hierarchical selection.
+    *   [ ] Implement directory toggles with cascading effect.
+    *   [ ] Implement drag-range selection support.
+    *   [ ] **(Week 2 Deliverable)** Achieve 100% CLI parity with old Electron "bulk select" logic (related to CLI tasks).
+*   **`Aggregator` (Week 3 Deliverable)**
+    *   [ ] Implement file content concatenation.
+    *   [ ] Implement splitting content into N parts.
+    *   [ ] Generate Table of Contents (TOC).
+    *   [ ] Stream directly into `ByteBuffer` (e.g., from SwiftNIO, or a similar efficient buffer).
+    *   [ ] **(Week 3 Deliverable)** `Aggregator` streaming + split copy implemented.
+*   **`HeatmapStats`**
+    *   [ ] Pre-compute per-folder max lines for UI heatmap.
+    *   [ ] Use `OrderedDictionary` from `swift-collections`.
+*   **General `CodeCopierCore` Requirements**
+    *   [ ] Ensure all algorithms are total (Sendable, no `@unchecked Sendable`).
+    *   [ ] Cover all `CodeCopierCore` components with property-based tests in `CoreTests`.
+
+**Phase 3: CLI Entry Point (`CodeCopierCLI`) (Week 4 Deliverable)**
+*   [ ] Integrate `swift-argument-parser`.
+*   [ ] Ensure every flag auto-documents via `--help`.
+*   [ ] Implement `codecopier scan` command (e.g., `scan Sources --ignore-txt --format json > report.json`).
+*   [ ] Implement `codecopier select` command (e.g., `select --folder Sources --select '**/*.swift' --deselect 'Tests/**'`).
+*   [ ] Implement `codecopier copy` command (e.g., `copy --split 4 | pbcopy`).
+*   [ ] Implement machine-parseable timing metrics (`--log-format json`) for GitHub Actions.
+*   [ ] Support bash/zsh completion plugin.
+*   [ ] Verify all CLI behaviours in `CLITests` (using `swift run` inside fixtures).
+*   [ ] **(Week 4 Deliverable)** CLI completes (help, completions, JSON out).
+*   [ ] **(Week 4 Deliverable)** Publish v0.1 of `codecopier` CLI.
+
+**Phase 4: macOS 15.4 App (`CodeCopierUI`) (Weeks 5-6 Deliverable)**
+*   [ ] Implement SwiftUI `OutlineGroup` for file tree with 100 Hz scrolling.
+*   [ ] Use `GlassBackground` modifier (macOS 15) for frosted sidebar.
+*   [ ] Implement fallback to `.ultraThinMaterial` on macOS 14.
+*   [ ] Adopt `OrnamentTitleBar` style (inline SF Symbols, progress ring).
+*   [ ] Implement `FileImporter` sheet, piping URL to `CodeCopierCore` asynchronously.
+*   [ ] Use SwiftData for persisting recent folders & selections.
+*   [ ] Ensure UI lives on `MainActor`; Core runs in detached tasks.
+*   [ ] Adhere to UI code path length ≤ 250 LOC.
+*   [ ] **(Weeks 5-6 Deliverable)** SwiftUI macOS shell complete (ornament glass UI, live progress, drag-range selection).
+
+**Phase 5: Testing & Quality Gates (Ongoing)**
+*   **Unit / Property Tests (`CoreTests`, `CLITests`)**
+    *   [ ] Use `swift-testing` DSL (`#expect`, `#require`).
+    *   [ ] Create `FileDiscovererSpec.swift` (prove "no duplicates", "ignores binary").
+    *   [ ] Create `SelectionEngineLaws.swift` (idempotency, set algebra).
+    *   [ ] Create `AggregatorSplitSpec.swift` (golden files < 1 MiB under `Fixtures/`).
+*   **CLI Integration Tests (`CLITests`)**
+    *   [ ] Spawn `codecopier` with `Process`, assert stdout/stderr.
+    *   [ ] Set up GitHub Actions to run tests on macOS-15 & macOS-14 matrices.
+    *   [ ] Use `--enable-swift-testing` flag (until SPM bug resolved).
+*   **Static Analysis**
+    *   [ ] Integrate `swift format --lint` (Swift 6 toolchain).
+    *   [ ] Integrate `swift-lint` plugin (sourcekit-lsp).
+    *   [ ] Compile with `-enable-library-evolution -strict-concurrency=complete`.
+*   **Performance Benchmarks**
+    *   [ ] Integrate `swift-benchmark` package.
+    *   [ ] Create 10k-file fixture for benchmarking.
+    *   [ ] **(Part of Week 3 Deliverable)** 1 M LOC fixture aggregation bench < 800 ms.
+    *   [ ] Set up PR check: Fail if mean aggregation time > 1s on M2.
+
+**Phase 6: Build & Release Workflow**
+*   **CI (GitHub Actions)**
+    *   [ ] `swift build -c release`.
+    *   [ ] `swift test --enable-swift-testing -c release` on macOS-15 runner.
+*   **Nightly Artifacts & DMG (Week 7 Deliverable)**
+    *   [ ] Implement `ReleaseDmgPlugin` (SPM plugin capability).
+        *   [ ] Archive app.
+        *   [ ] Notarise app.
+        *   [ ] Sign app.
+        *   [ ] Build `.dmg`.
+    *   [ ] `swift package plugin --allow-writing-to-directory .release dmg`.
+    *   [ ] Upload artifact.
+    *   [ ] **(Week 7 Deliverable)** DMG plugin implemented.
+    *   [ ] **(Week 7 Deliverable)** Notarisation process set up.
+    *   [ ] **(Week 7 Deliverable)** Auto-update feed set up.
+*   **Versioning**
+    *   [ ] Establish Core & CLI tags: `vX.Y.Z` (SemVer).
+    *   [ ] Establish UI tags: `app-vX.Y.Z`.
+*   **Migration**
+    *   [ ] Implement `codecopier migrate --import-state ~/Library/Application\ Support/...` command to port selections from Electron version.
+    *   [ ] **(Week 8 Deliverable)** Write migration guide.
+
+**Phase 7: Finalization (Week 8 Deliverable)**
+*   [ ] **(Week 8 Deliverable)** Bug-bash.
+*   [ ] **(Week 8 Deliverable)** Tag CodeCopier 1.0.

@@ -1,0 +1,4 @@
+module CodeCopierPackageTests {
+    header "/Users/test/CodeCopy/.build/arm64-apple-macosx/debug/CodeCopierPackageTests.build/CodeCopierPackageTests-Swift.h"
+    requires objc
+}

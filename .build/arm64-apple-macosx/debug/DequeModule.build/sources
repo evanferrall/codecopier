@@ -1,0 +1,16 @@
+/Users/test/CodeCopy/.build/checkouts/swift-collections/Sources/DequeModule/Deque+Codable.swift
+/Users/test/CodeCopy/.build/checkouts/swift-collections/Sources/DequeModule/Deque+Collection.swift
+/Users/test/CodeCopy/.build/checkouts/swift-collections/Sources/DequeModule/Deque+CustomReflectable.swift
+/Users/test/CodeCopy/.build/checkouts/swift-collections/Sources/DequeModule/Deque+Descriptions.swift
+/Users/test/CodeCopy/.build/checkouts/swift-collections/Sources/DequeModule/Deque+Equatable.swift
+/Users/test/CodeCopy/.build/checkouts/swift-collections/Sources/DequeModule/Deque+ExpressibleByArrayLiteral.swift
+/Users/test/CodeCopy/.build/checkouts/swift-collections/Sources/DequeModule/Deque+Extras.swift
+/Users/test/CodeCopy/.build/checkouts/swift-collections/Sources/DequeModule/Deque+Hashable.swift
+/Users/test/CodeCopy/.build/checkouts/swift-collections/Sources/DequeModule/Deque+Testing.swift
+/Users/test/CodeCopy/.build/checkouts/swift-collections/Sources/DequeModule/Deque._Storage.swift
+/Users/test/CodeCopy/.build/checkouts/swift-collections/Sources/DequeModule/Deque._UnsafeHandle.swift
+/Users/test/CodeCopy/.build/checkouts/swift-collections/Sources/DequeModule/Deque.swift
+/Users/test/CodeCopy/.build/checkouts/swift-collections/Sources/DequeModule/_DequeBuffer.swift
+/Users/test/CodeCopy/.build/checkouts/swift-collections/Sources/DequeModule/_DequeBufferHeader.swift
+/Users/test/CodeCopy/.build/checkouts/swift-collections/Sources/DequeModule/_DequeSlot.swift
+/Users/test/CodeCopy/.build/checkouts/swift-collections/Sources/DequeModule/_UnsafeWrappedBuffer.swift

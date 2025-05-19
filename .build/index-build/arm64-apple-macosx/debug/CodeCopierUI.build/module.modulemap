@@ -1,0 +1,4 @@
+module CodeCopierUI {
+    header "/Users/test/CodeCopy/.build/index-build/arm64-apple-macosx/debug/CodeCopierUI.build/CodeCopierUI-Swift.h"
+    requires objc
+}

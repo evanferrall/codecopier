@@ -1,0 +1,58 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:CodeCopy}/CodeCopier",
+            "name": "Debug codecopier (CodeCopier)",
+            "program": "${workspaceFolder:CodeCopy}/CodeCopier/.build/debug/codecopier",
+            "preLaunchTask": "swift: Build Debug codecopier (CodeCopier)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:CodeCopy}/CodeCopier",
+            "name": "Release codecopier (CodeCopier)",
+            "program": "${workspaceFolder:CodeCopy}/CodeCopier/.build/release/codecopier",
+            "preLaunchTask": "swift: Build Release codecopier (CodeCopier)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:CodeCopy}/CodeCopier",
+            "name": "Debug CodeCopierApp (CodeCopier)",
+            "program": "${workspaceFolder:CodeCopy}/CodeCopier/.build/debug/CodeCopierApp",
+            "preLaunchTask": "swift: Build Debug CodeCopierApp (CodeCopier)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:CodeCopy}/CodeCopier",
+            "name": "Release CodeCopierApp (CodeCopier)",
+            "program": "${workspaceFolder:CodeCopy}/CodeCopier/.build/release/CodeCopierApp",
+            "preLaunchTask": "swift: Build Release CodeCopierApp (CodeCopier)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:CodeCopy}",
+            "name": "Debug CodeCopierCLI",
+            "program": "${workspaceFolder:CodeCopy}/.build/debug/CodeCopierCLI",
+            "preLaunchTask": "swift: Build Debug CodeCopierCLI"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:CodeCopy}",
+            "name": "Release CodeCopierCLI",
+            "program": "${workspaceFolder:CodeCopy}/.build/release/CodeCopierCLI",
+            "preLaunchTask": "swift: Build Release CodeCopierCLI"
+        }
+    ]
+}

@@ -1,0 +1,4 @@
+module Tiktoken {
+    header "/Users/test/CodeCopy/.build/arm64-apple-macosx/debug/Tiktoken.build/Tiktoken-Swift.h"
+    requires objc
+}

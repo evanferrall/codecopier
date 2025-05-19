@@ -1,0 +1,209 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+0 · Guiding principles
+Principle	Why it matters
+Pure‑SPM monorepo	Same instructions for Xcode, swift build, GitHub Actions. No Xcodeproj checked‑in.
+Packages over hand‑roll	Lean on swift‑argument‑parser, swift‑collections, swift‑system, swift‑testing, swift‑log, swift‑algorithms for correctness & perf.
+Async‑first	Swift 6's non‑isolated sendable by default and stricter concurrency checking prevent data races 
+GitHub
+CLI‑first	Every feature must ship as a head‑less command tested by swift test --enable‑swift‑testing 
+Swift Forums
+ before it surfaces in the GUI.
+UI = thin shell	The macOS app is a small SwiftUI target that calls the same public APIs used by the CLI tests.
+Translucent / ornament glass	Use macOS 15's new GlassBackground & "ornament" window materials to give a frosted sidebar / vibrant header.
+
+1 · Repository layout (single Git repo)
+ruby
+Copy
+Edit
+CodeCopier/
+├── Package.swift
+├── Sources/
+│   ├── CodeCopierCore/           // discovery, filtering, selection, aggregation
+│   ├── CodeCopierCLI/            // `codecopier` binary (argument‑parser)
+│   ├── CodeCopierUI/             // macOS app target (SwiftUI + OrnamentGlass)
+│   └── Plugins/
+│       └── ReleaseDmgPlugin/    // spm‑plugin that notarises & builds .dmg
+└── Tests/
+    ├── CoreTests/                // swift‑testing + fixtures
+    └── CLITests/                 // end‑to‑end "golden file" tests
+Package.swift (high‑level)
+swift
+Copy
+Edit
+// swift-tools-version: 6.0
+import PackageDescription
+
+let package = Package(
+  name: "CodeCopier",
+  platforms: [.macOS(.v15)],
+  products: [
+    .executable(name: "codecopier", targets: ["CodeCopierCLI"]),
+    .library(name: "CodeCopierCore", targets: ["CodeCopierCore"]),
+    .application(name: "CodeCopierApp", targets: ["CodeCopierUI"])
+  ],
+  dependencies: [
+    .package(url: "https://github.com/apple/swift-argument-parser.git", from: "2.0.0"),   //⇢ CLI flags :contentReference[oaicite:2]{index=2}
+    .package(url: "https://github.com/apple/swift-log.git", from: "1.5.0"),
+    .package(url: "https://github.com/apple/swift-collections.git", from: "1.1.0"),
+    .package(url: "https://github.com/apple/swift-testing.git", from: "0.3.0"),          //⇢ new XCTest‑free DSL :contentReference[oaicite:3]{index=3}
+    .package(url: "https://github.com/apple/swift-system.git", from: "1.2.0")
+  ],
+  targets: [
+    /* Core */
+    .target(
+      name: "CodeCopierCore",
+      dependencies: [
+        .product(name: "Collections", package: "swift-collections"),
+        .product(name: "SystemPackage", package: "swift-system"),
+        .product(name: "Logging", package: "swift-log")
+      ],
+      swiftSettings: [.enableExperimentalFeature("StrictConcurrency")]
+    ),
+
+    /* CLI */
+    .executableTarget(
+      name: "CodeCopierCLI",
+      dependencies: [
+        "CodeCopierCore",
+        .product(name: "ArgumentParser", package: "swift-argument-parser"),
+        .product(name: "Logging", package: "swift-log")
+      ]),
+
+    /* macOS */
+    .target(
+      name: "CodeCopierUI",
+      dependencies: ["CodeCopierCore"],
+      resources: [.process("Assets")],
+      swiftSettings: [.enableExperimentalFeature("StrictConcurrency")]
+    ),
+
+    /* Tests */
+    .testTarget(
+      name: "CoreTests",
+      dependencies: [
+        "CodeCopierCore",
+        .product(name: "Testing", package: "swift-testing")
+      ],
+      resources: [.copy("Fixtures")]
+    ),
+    .testTarget(
+      name: "CLITests",
+      dependencies: [
+        "CodeCopierCLI",
+        .product(name: "Testing", package: "swift-testing")
+      ],
+      resources: [.copy("Fixtures")]
+    ),
+
+    /* Release plugin (optional) */
+    .plugin(
+      name: "ReleaseDmgPlugin",
+      capability: .command(intent: .custom(
+        verb: "release-dmg",
+        description: "Archive, notarise and sign the macOS app."
+      ))
+    )
+  ]
+)
+2 · Core architecture (CodeCopierCore)
+Component	Responsibility	Implementation notes
+FileDiscoverer	 walks FS asynchronously, returns [FileInfo]	AsyncThrowingStream, back‑pressure; uses .withTaskGroup for parallel SHA‑1 & line‑count (Foundation I/O is Sendable now)
+FilterPipeline	 Rules: extensions, ignored dirs, libs, size cap, binary sniff	express each rule as FilePredicate closure; combine via filter(using:)
+SelectionEngine	 Hierarchical selection, directory toggles cascade, drag‑range support	Represent selection state as BitSet keyed by file index for O(1) toggle
+Aggregator	 concatenate or split into N parts; generates TOC	streams directly into ByteBuffer (SwiftNIO) to avoid giant strings
+HeatmapStats	 pre‑computes per‑folder max lines for UI heatmap	fold using OrderedDictionary from swift‑collections
+
+All algorithms must be total (Sendable, @unchecked Sendable banned) and covered by property‑based tests in CoreTests.
+
+3 · CLI entry point (CodeCopierCLI)
+Built with swift‑argument‑parser so every flag auto‑docs via --help 
+GitHub
+
+Supports bash/zsh completion plugin.
+
+Example:
+
+shell
+Copy
+Edit
+$ codecopier scan Sources --ignore-txt --format json > report.json
+$ codecopier select --folder Sources --select '**/*.swift' --deselect 'Tests/**'
+$ codecopier copy --split 4 | pbcopy
+When run inside GitHub Actions it prints machine‑parseable timing metrics (--log‑format json).
+
+All behaviours are verified in CLITests using swift run inside fixtures.
+
+4 · macOS 15.4 App (CodeCopierUI)
+Layer	Details
+SwiftUI + 100 Hz scrolling OutlineGroup for file tree.	
+Use the new GlassBackground modifier from macOS 15 for an "ornament glass" frosted sidebar; fall back to .ultraThinMaterial on macOS 14.	
+Window toolbar adopts OrnamentTitleBar style (inline SF Symbols, progress ring).	
+FileImporter sheet pipes URL → CodeCopierCore (async).	
+SwiftData for persisting recent folders & selections.	
+Entire UI lives on the MainActor; Core runs in detached tasks.	
+
+UI code path length ≤ 250 LOC – everything else belongs in Core.
+
+5 · Testing & quality gates
+Unit / property tests
+swift test --enable‑swift‑testing activates the new DSL (#expect, #require) 
+Swift Forums
+.
+Each module owns its spec folder:
+
+FileDiscovererSpec.swift – prove "no duplicates", "ignores binary".
+
+SelectionEngineLaws.swift – idempotency, set algebra.
+
+AggregatorSplitSpec.swift – golden files < 1 MiB kept under Fixtures/.
+
+CLI integration tests
+Spawn codecopier with Process, assert stdout / stderr.
+
+Run on macOS‑15, macOS‑14 matrices (GitHub Actions).
+
+Pass the published fix‑flag --enable‑swift‑testing until SPM bug is gone 
+Swift Forums
+.
+
+Static analysis
+swift format --lint (Swift 6 toolchain)
+
+swift‑lint plugin (sourcekit‑lsp)
+
+Compile with -enable-library-evolution -strict-concurrency=complete.
+
+Performance benchmarks
+swift benchmark using the upcoming swift‑benchmark package on 10k‑file fixture.
+
+Fail PR if mean aggregation time > 1 s on M2.
+
+6 · Build & release workflow
+Stage	Action
+CI	swift build -c release && swift test --enable‑swift‑testing -c release on macOS‑15 runner
+Nightly artifacts	swift package plugin --allow-writing-to-directory .release dmg (custom plugin) → notarise → upload.
+Versioning	Core & CLI tags vX.Y.Z, UI tags app‑vX.Y.Z. SemVer for CLI (automation‑friendly).
+Migration	Provide codecopier migrate --import-state ~/Library/Application\ Support/... to port selections from the Electron version.
+
+7 · Timeline
+Week	Deliverable
+1	Boot repo, skeleton Package.swift, baseline FileDiscoverer with sync filter tests.
+2	SelectionEngine, 100 % CLI parity with old Electron "bulk select" logic.
+3	Aggregator streaming + split copy. 1 M LOC fixture bench under 800 ms.
+4	CLI completes (help, completions, JSON out). Publish v0.1.
+5–6	SwiftUI macOS shell – ornament glass UI, live progress, drag‑range selection.
+7	DMG plugin, notarisation, auto‑update feed.
+8	Bug‑bash, write migration guide, tag CodeCopier 1.0.
+
+Future ideas
+Vision Pro port (constructive 3‑D file tree).
+
+LSP plugin to copy selected code straight from Xcode.
+
+WebAssembly version compiled with Swift‑Wasm once Swift 6 WAMR backend stabilises.
+
+Outcome: the project ships as a single SPM workspace; every path is test‑driven at CLI‑level, UI is a stylistic wrapper using macOS 15's ornament glass, and the heavy lifting lives in composable, concurrent Swift 6 modules.
