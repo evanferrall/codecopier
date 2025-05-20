@@ -1,4 +1,0 @@
-module BitCollections {
-    header "/Users/test/CodeCopy/.build/index-build/arm64-apple-macosx/debug/BitCollections.build/BitCollections-Swift.h"
-    requires objc
-}

@@ -1,4 +1,0 @@
-module CodeCopierCore {
-    header "/Users/test/CodeCopy/.build/index-build/arm64-apple-macosx/debug/CodeCopierCore.build/CodeCopierCore-Swift.h"
-    requires objc
-}
