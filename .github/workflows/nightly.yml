@@ -1,0 +1,15 @@
+name: Nightly Instruments
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+
+jobs:
+  instruments:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Instruments
+        run: |
+          scripts/run_instruments.sh
+

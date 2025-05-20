@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install SwiftLint
+        run: brew install swiftlint
+      - name: SwiftLint
+        run: swiftlint --strict
+      - name: Test
+        run: swift test --enable-code-coverage
+      - name: Documentation Diagnostics
+        run: swift package generate-documentation --target CodeCopier --output-path docs --disable-indexing --diagnostics
+      - name: Danger
+        uses: docker://ghcr.io/danger/danger-swift:3.13.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: --fail-on-errors
+

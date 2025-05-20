@@ -1,0 +1,5 @@
+opt_in_rules: []
+disable_all_rules: false
+included:
+  - CodeCopier
+
