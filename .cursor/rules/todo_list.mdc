@@ -60,6 +60,21 @@ alwaysApply: false
     *   [ ] Ensure all algorithms are total (Sendable, no `@unchecked Sendable`).
     *   [ ] Cover all `CodeCopierCore` components with property-based tests in `CoreTests`.
 
+
+**Roadmap Step 3: Concrete Refactor Tasks**
+*   **UI cleanup**
+    *   [ ] Replace manual `.background(.ultraThinMaterial)` wrappers with `GlassPane` view modifier.
+    *   [ ] Move `@State var show*` toggles into a `@Bindable` `UIOptions` struct stored in `AppEnvironment`.
+    *   [ ] Swap `List` for `Table` on macOS 15; group by folder path for large trees.
+    *   [ ] Add `withAnimation(.interactiveSpring)` to selection and expansion; heavy layouts use `.transaction { $0.disablesAnimations = sizeBig }`.
+*   **Concurrency & data flow**
+    *   [ ] `FileScannerService` actor streams `AsyncStream<FileMeta>` using `TaskGroup` with `maxConcurrent` set to `hardwareConcurrency`.
+    *   [ ] `AppDataStore` actor wraps SwiftData `ModelContext`; purge old entries nightly via history API.
+    *   [ ] `TokenService` actor batches requests and publishes `@Published` `currentTokenCount`.
+*   **Performance guards**
+    *   [ ] Feed `ListState` pages of 300 items using `.prefetch(offset:)` to keep arrays under 5k elements.
+    *   [ ] Compute SHA and line counts off-main thread; persist in SwiftData then publish via Observation.
+    *   [ ] Add `OSSignposter` signposts in each actor for Instruments profiling.
 **Phase 3: CLI Entry Point (`CodeCopierCLI`) (Week 4 Deliverable)**
 *   [ ] Integrate `swift-argument-parser`.
 *   [ ] Ensure every flag auto-documents via `--help`.
