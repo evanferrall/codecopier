@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Swift
+        uses: swift-actions/setup-swift@v1
+        with:
+          swift-version: '6.1'
+      - name: Install SwiftLint
+        run: brew install swiftlint
+      - name: SwiftLint
+        run: swiftlint
+      - name: Run tests
+        run: swift test --enable-code-coverage
+      - name: Check coverage
+        run: |
+          COVERAGE=$(swift test --enable-code-coverage --show-code-coverage 2>/dev/null | tail -n 1 | awk '{print $NF}' | tr -d '%')
+          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          if [ -z "$COVERAGE" ] || [ "$COVERAGE" -lt 90 ]; then
+            echo "Test coverage below required threshold" >&2
+            exit 1
+          fi
+      - name: Build DocC
+        run: swift package --allow-writing-to-directory docs generate-documentation --output-path docs

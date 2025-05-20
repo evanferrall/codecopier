@@ -1,0 +1,11 @@
+opt_in_rules:
+  - todo
+  - trailing_whitespace
+  - type_body_length
+
+included:
+  - CodeCopier
+
+excluded:
+  - .build
+  - docs
