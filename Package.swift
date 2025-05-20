@@ -34,8 +34,8 @@ let package = Package(
                 // .product(name: "AsyncAlgorithms", package: "swift-async-algorithms"), // REMOVED
                 "Tiktoken"
             ],
-            resources: [.process("Assets.xcassets")],
             path: "CodeCopier/Sources/CodeCopierUI",
+            resources: [.process("Assets.xcassets")],
             swiftSettings: [.enableExperimentalFeature("StrictConcurrency")]
         ),
         .target(
@@ -58,6 +58,11 @@ let package = Package(
             dependencies: ["CodeCopierCLI"],
             path: "CodeCopier/Tests/CLITests",
             resources: [.copy("Fixtures")] // Added fixture resources for CLI tests
+        ),
+        .testTarget(
+            name: "UITests",
+            dependencies: ["CodeCopierUI"],
+            path: "CodeCopier/Tests/UITests"
         ),
         // Add other targets as they exist in your project
         .plugin(
