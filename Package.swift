@@ -34,8 +34,8 @@ let package = Package(
                 // .product(name: "AsyncAlgorithms", package: "swift-async-algorithms"), // REMOVED
                 "Tiktoken"
             ],
-            resources: [.process("Assets.xcassets")],
             path: "CodeCopier/Sources/CodeCopierUI",
+            resources: [.process("Assets.xcassets")],
             swiftSettings: [.enableExperimentalFeature("StrictConcurrency")]
         ),
         .target(
