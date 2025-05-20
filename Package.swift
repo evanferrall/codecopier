@@ -59,6 +59,11 @@ let package = Package(
             path: "CodeCopier/Tests/CLITests",
             resources: [.copy("Fixtures")] // Added fixture resources for CLI tests
         ),
+        .testTarget(
+            name: "UITests",
+            dependencies: ["CodeCopierUI"],
+            path: "CodeCopier/Tests/UITests"
+        ),
         // Add other targets as they exist in your project
         .plugin(
             name: "ReleaseDmgPlugin",
